@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        .film-item {
+            border: 1px solid black;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+
+        .film-item img {
+            max-width: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        
+
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Dashboard</h1>
+    <button id="logoutButton">Logout</button>
+    <input type="text" id="searchInput" placeholder="Search films">
+    <select id="sortSelect">
+        <option value="title">Title</option>
+        <option value="release_date">Release Date</option>
+    </select>
+    <div id="filmList"></div>
+
+    <script>
+        const logoutButton = document.getElementById('logoutButton');
+        const filmList = document.getElementById('filmList');
+        const searchInput = document.getElementById('searchInput');
+        const sortSelect = document.getElementById('sortSelect');
+
+        function checkLogin() {
+            if (!localStorage.getItem('loggedInUser')) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        checkLogin();
+
+        logoutButton.addEventListener('click', () => {
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'login.html';
+        });
+
+        async function fetchFilms() {
+            try {
+                const response = await fetch('https://ghibliapi.vercel.app/films');
+                let films = await response.json();
+                displayFilms(films);
+                searchInput.addEventListener('input', () => filterFilms(films));
+                sortSelect.addEventListener('change', () => filterFilms(films));
+            } catch (error) {
+                console.error('Error fetching films:', error);
+                filmList.innerHTML = '<p>Error loading films.</p>';
+            }
+        }
+
+        function displayFilms(films) {
+            filmList.innerHTML = films.map(film => `
+                <div class="film-item">
+                    <img src="${film.image}" alt="${film.title}">
+                    <h3>${film.title}</h3>
+                    <p>${film.description}</p>
+                </div>
+            `).join('');
+        }
+
+        function filterFilms(films) {
+            const searchTerm = searchInput.value.toLowerCase();
+            const sortBy = sortSelect.value;
+            let filteredFilms = films.filter(film => film.title.toLowerCase().includes(searchTerm));
+
+            filteredFilms.sort((a, b) => {
+                if (sortBy === 'title') {
+                    return a.title.localeCompare(b.title);
+                } else {
+                    return new Date(a.release_date) - new Date(b.release_date);
+                }
+            });
+            displayFilms(filteredFilms);
+        }
+
+        fetchFilms();
+    </script>
+</body>
+
+</html>
