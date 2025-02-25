@@ -56,7 +56,7 @@
                 console.log(films);
                 displayFilms(films);
                 searchInput.addEventListener('input', () => filterFilms(films));
-                sortSelect.addEventListener('change', () => filterFilms(films));
+                sortSelect.addEventListener('click', () => filterFilms(films));
             } catch (error) {
                 console.error('Error fetching films ', error);
                 filmList.innerHTML = '<p>Error loading films.</p>';
