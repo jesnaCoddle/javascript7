@@ -66,6 +66,7 @@
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            
             const users = JSON.parse(localStorage.getItem('users') || '[]');
             if (users.find(user => user.email === email)) {
                 document.getElementById('registerError').textContent = 'Email already registered.';
